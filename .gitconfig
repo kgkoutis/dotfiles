@@ -1,0 +1,14 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = “Konstantinos
+	email = “Konstantinos.Gkoutis-CIC.Netherlands@ibm.com”
+[core]
+	editor = vim
+[diff]
+	tool = vimdiff
+[help]
+	autocorrect = 1

@@ -1,0 +1,122 @@
+#!/bin/zsh
+
+dir=$(cd "$(dirname "$0" )"|| exit; pwd -P)
+
+# zsc [.] -- source ~/.zshrc file if argument is '.', otherwise open it with vim
+zsc() {
+    if [[ $1 == '.' ]]; then
+        source ~/.zshrc
+    else
+        vim "${dir}/.functions"
+    fi
+}
+
+
+# mys -- show me the description of my scripts in .dotfiles/.functions
+function mys() {
+  grep '# mys' ~/.myzshcode.sh | sed "/grep '# mys'/d" | awk '{out=""; for(i=3;i<=NF;i++){out=out" "$i}; print out}'
+}
+
+# cleanDocker -- clean dangling and developing images and running docker
+function cleanDocker() {
+    docker rm -f -v $(docker ps -aq) 2>dev/null
+    docker rmi $(docker images -qf "dangling=true") 2>dev/null
+    docker rmi $(docker images | grep "dev-" | awk {"print $1"}) 2>/dev/null
+    docker rmi $(docker images | grep "^<none>" | awk {"print $1"}) 2>/dev/null
+}
+
+# extract -- extract a zipped file
+function extract () {
+    if [ -f $1 ] ; then
+        case $1 in
+            *.tar.bz2)   tar xjf $1     ;;
+            *.tar.gz)    tar xzf $1     ;;
+            *.bz2)       bunzip2 $1     ;;
+            *.rar)       unrar e $1     ;;
+            *.gz)        gunzip $1      ;;
+            *.tar)       tar xf $1      ;;
+            *.tbz2)      tar xjf $1     ;;
+            *.tgz)       tar xzf $1     ;;
+            *.zip)       unzip $1       ;;
+            *.Z)         uncompress $1  ;;
+            *.7z)        7z x $1        ;;
+            *)     echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# portpid -- find the pid of a port 
+function portpid() {
+    echo $1 | xargs -I % sh -c 'netstat -vanp tcp |grep %' | sed -n 1p | awk '{print $9}'
+}
+
+# mkcd -- mkdir and cd 
+function mkcd() {
+    NAME=$1
+    mkdir -p "$NAME"
+    cd "$NAME"
+}
+
+# rmcd -- cd and remove -- with care!
+function rmcd() {
+    cwd=$PWD
+    if [[ $(bash -c 'echo ${PWD#/Users/konstantinos/Downloads/}') != $PWD || $(bash -c 'echo ${PWD#/Users/konstantinos/Desktop/}') != $PWD || $(bash -c 'echo ${PWD#/Users/konstantinos/Documents/}') != $PWD ]]; then cd ..; rm -rf $cwd; else echo "Error: cannot delete this folder, because it's not a nested folder inside ~/Desktop or ~/Downloads or ~/Documents"; fi
+}
+
+# up -- go up #n directories
+function up() {
+    DEEP=$1
+    for i in $(seq 1 ${DEEP:-"1"}); do cd ../; done
+}
+
+# trn -- translate from dutch to english ()
+function trn() {
+    trans -b "$1" :en
+}
+
+# zipf -- make a zip of a folder with specific [name]
+function zipf () {
+    zip -r "$1".zip "$1"
+}
+
+# tstuff -- return today's stuff
+function tstuff() {
+    if (($# == 0)); then 
+        find . -cmin -600 -maxdepth 1 | xargs basename | sed '/^\.$/d; /.DS_Store/d'| xargs -I % sh -c 'ls -al | grep %'
+    else
+        find . -cmin -$((60*$1)) -maxdepth 1 | xargs basename | sed '/^\.$d; /.DS_Store/d'| xargs -I % sh -c 'ls -al | grep %'
+    fi
+}
+
+# mcex -- it does not work good though for hidden files (with a "dot" in front of them)
+function mcex () {
+    if (($# == 2)); then
+        unset arg1 arg2
+        test ! -z $1 && test ! -z $2 && arg1=${1##.} && arg2=${2##.} && fori 'mv -n $i ${i%%.$arg1}.$arg2' 'ls *.$arg1' || :
+        test -z $1 && test ! -z $2 && arg2=${2##.} && fori 'mv -n $i $i.$arg2' 'find . -type f  | cut -c 3- | sed -n "/\..*/!p"' || :
+        test ! -z $1 && test -z $2 && arg1=${1##.} && fori 'mv -n $i ${i%%.$arg1}' 'ls *.$arg1' || :
+    else
+        echo Please provide more arguments e.g. mcex '.py'. '.js'. The contents of the folder are: && ls
+    fi
+}
+
+# timezone -- find the timezone of a city, e.g. timezone Athens
+function timezone () {TZ=$(ag -g "$(echo $1 | gsed "s; ;_;g")" /usr/share/zoneinfo | cut -c 21-) date}
+
+# delSc -- delete all Screenshots for MacOS
+function delSc() {while read -r i; do detox "$i";done< <(ls | grep -E 'Screenshot.*.png'); ls Screenshot*.png | xargs rm -f}
+
+# i -- get inside the file if it is the only one in the repository
+function i() {
+    count_dir=$(ls -d $PWD/*/ | wc -l)
+    if ((count_dir == 1)); then
+        cd "$(ls -d $PWD/*/)"
+    fi
+}
+
+# ms2pdf -- convert ms to pdf with groff
+function ms2pdf() {
+    tmp="${1%\.*}"; rm -f $tmp.pdf && groff -ms -T pdf $1 > $tmp.pdf
+}

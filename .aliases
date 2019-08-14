@@ -1,0 +1,15 @@
+#!/bin/env sh
+
+alias cls='clear'
+alias lg='lazygit'
+alias bd='. bd -si'
+alias mkdc='mkcd'
+alias rmdc='rmcd'
+alias mdkir='mkdir'
+alias sl='ls'
+alias ....='cd ../../'
+alias vsc='vim ~/.vim/.vimrc'
+alias transp="perl -00 -lpe 's/\n/ /g'"
+alias cleanImages='docker rm -vf $(docker ps -a -q) 2>/dev/null; docker rmi -f $(docker images -a -q) 2>/dev/null'
+alias mccd='for i in {1..20000}; do g="$(( ( RANDOM % 2 )))";printf "%s" $g; done'
+alias ghrepos="curl -si https://api.github.com/users/kgkoutis/repos | grep 'full_name' | cut -c 18-"
