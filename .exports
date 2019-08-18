@@ -1,3 +1,4 @@
 #!/bin/env sh
 
 # To be worked upon...
+. /usr/local/etc/profile.d/z.sh

@@ -98,6 +98,7 @@ endfunction
 " Get out of text wrappers
 inoremap <C-e> <C-o>A;<Esc>o
 inoremap <C-w> <C-o>a,
+inoremap <C-o> <C-o>O
 
 " Set Leader key
 :let mapleader = ","

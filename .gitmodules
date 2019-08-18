@@ -118,3 +118,6 @@
 [submodule "vim/vim-addons/vim-snippets"]
 	path = vim/vim-addons/vim-snippets
 	url = git://github.com/honza/vim-snippets
+[submodule "vim/vim-addons/Ultisnips"]
+	path = vim/vim-addons/Ultisnips
+	url = https://github.com/SirVer/ultisnips.git
